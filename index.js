@@ -1,20 +1,20 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("./serviceAccountKey.json");
+
+if (!process.env.FIREBASE_SERVICE_KEY) {
+  throw new Error("FIREBASE_SERVICE_KEY environment variable not set");
+}
+
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_KEY);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-
 const db = admin.firestore();
-db.settings({
-  timestampsInSnapshots: true,
-  maxRetries: 3
-});
 
 const express = require("express");
 const multer = require("multer");
-const pdfParse = require("pdf-parse"); 
+const pdfParse = require("pdf-parse");
 const csv = require("csv-parser");
 const fs = require("fs");
 const cors = require("cors");
@@ -23,16 +23,13 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-// Serve public
 app.use(express.static("public"));
 
-// Configuration
 const upload = multer({ dest: "uploads/" });
 
 app.post("/upload", upload.single("file"), async (req, res) => {
   const uploadId = Date.now().toString();
-  
+
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -44,21 +41,17 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
     let resultData;
 
-    // PDF Extraction
     if (fileType.includes("pdf")) {
       const buffer = fs.readFileSync(filePath);
       const data = await pdfParse(buffer);
 
       resultData = {
         type: "pdf",
-        fileName: fileName,
+        fileName,
         content: data.text,
-        pageCount: data.numpages
+        count: data.numpages,
       };
-    }
-
-    // CSV Extraction
-    else if (fileType.includes("csv")) {
+    } else if (fileType.includes("csv")) {
       const rows = [];
 
       await new Promise((resolve, reject) => {
@@ -71,55 +64,47 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
       resultData = {
         type: "csv",
-        fileName: fileName,
+        fileName,
         content: rows,
-        rowCount: rows.length
+        count: rows.length,
       };
-    }
-
-    else {
+    } else {
       fs.unlinkSync(filePath);
-      return res.status(400).json({ error: "Unsupported file type (only PDF/CSV)" });
+      return res.status(400).json({ error: "Unsupported file type" });
     }
 
-    // Delete temp file
     fs.unlinkSync(filePath);
 
-    
     const docRef = await db.collection("extracted_files").add({
       uploadId,
-      fileName: fileName,
+      fileName,
       fileType: resultData.type,
       extractedData: resultData.content,
       status: "completed",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      pageCount: resultData.pageCount || resultData.rowCount || 0
+      count: resultData.count,
     });
 
     res.json({
       success: true,
-      message: "File processed and saved",
       uploadId,
       fileId: docRef.id,
-      fileName: fileName,
+      fileName,
       type: resultData.type,
-      contentPreview: typeof resultData.content === 'string' 
-        ? resultData.content.substring(0, 200) + "..." 
-        : `${resultData.content.length} rows`
+      preview:
+        typeof resultData.content === "string"
+          ? resultData.content.substring(0, 200) + "..."
+          : `${resultData.content.length} rows`,
     });
-
   } catch (error) {
-    console.error("Upload error:", error);
-    
-    
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
 
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       error: error.message,
-      uploadId
+      uploadId,
     });
   }
 });
@@ -128,7 +113,7 @@ app.get("/health", (req, res) => {
   res.json({
     status: "ok",
     uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
