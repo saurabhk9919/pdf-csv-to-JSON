@@ -16,6 +16,7 @@ async function uploadFile() {
     formData.append("file", file);
 
     const response = await fetch("https://pdf-csv-to-json-production.up.railway.app/upload", {
+      method: "POST",
       body: formData,
       timeout: 120000 
     });
