@@ -1,42 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>File Extractor</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Extractor - PDF & CSV to JSON</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .drag-over {
+      background-color: rgba(59, 130, 246, 0.1);
+      border-color: rgb(59, 130, 246);
+    }
+
+    .file-input-label:hover {
+      background-color: rgba(59, 130, 246, 0.05);
+    }
+
+    .result-container {
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50 min-h-screen py-6 px-4 sm:px-6 lg:px-8">
 
-  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl">
-    
-    <h2 class="text-2xl font-bold mb-4 text-center">
-      Upload PDF / CSV
-    </h2>
-
-    <div class="mb-4">
-      <input type="file" id="fileInput" class="mb-4 w-full border p-2 rounded" />
-      <button onclick="uploadFile()"
-        class="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600 mb-2">
-        Upload File
-      </button>
-    </div>
-
-    <h3 class="mt-6 font-semibold">Result / Status:</h3>
-
-    <pre id="result"
-      class="mt-2 bg-gray-200 p-3 rounded text-sm overflow-auto h-64 whitespace-pre-wrap break-words"></pre>
-
-    <div class="mt-4 text-center">
-      <a href="https://console.firebase.google.com/project/extracter-project/firestore" 
-         target="_blank" 
-         class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-md hover:shadow-lg">
-        📝 View Data in Firestore Console
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8 sm:mb-12 animate-slide-in">
+      <div class="inline-block p-3 bg-blue-100 rounded-full mb-4">
+        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
         </svg>
-      </a>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">File Extractor</h1>
+      <p class="text-gray-600 text-sm sm:text-base">Convert PDF & CSV files to structured JSON data instantly</p>
     </div>
 
+    
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-6 animate-slide-in">
+      
+      
+      <div class="p-6 sm:p-8 border-b border-gray-100">
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Upload Your File</h2>
+        
+        
+        <div id="dropZone" class="file-input-label relative border-2 border-dashed border-blue-300 rounded-xl p-8 sm:p-12 text-center cursor-pointer transition-all duration-200 hover:border-blue-500">
+          <input type="file" id="fileInput" class="hidden" accept=".pdf,.csv" />
+          
+          <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          
+          <p class="text-gray-900 font-semibold text-base sm:text-lg mb-1">Drag and drop your file here</p>
+          <p class="text-gray-500 text-sm">or click to browse (PDF or CSV)</p>
+          <p id="fileName" class="text-blue-600 font-medium mt-3 text-sm sm:text-base"></p>
+        </div>
+
+      
+        <button onclick="uploadFile()"
+          id="uploadBtn"
+          class="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 sm:py-4 px-4 rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          <span id="btnText">Upload & Process</span>
+        </button>
+      </div>
+
+      <!-- Result Section -->
+      <div class="p-6 sm:p-8 bg-gray-50">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg sm:text-xl font-bold text-gray-900">Result / Status</h3>
+          <button id="copyBtn" class="hidden text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            📋 Copy
+          </button>
+        </div>
+        
+        <div class="result-container bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <pre id="result"
+            class="text-xs sm:text-sm text-gray-700 overflow-auto max-h-64 whitespace-pre-wrap break-words font-mono leading-relaxed">Select a file to get started...</pre>
+        </div>
+      </div>
+
+      
+      <div class="p-6 sm:p-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-t border-gray-100">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <a href="https://console.firebase.google.com/project/extracter-project/firestore" 
+             target="_blank" 
+             class="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-bold py-3 px-4 rounded-xl hover:from-orange-600 hover:to-yellow-600 transition-all shadow-md hover:shadow-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <span>View in Firestore</span>
+          </a>
+          
+          <a href="https://github.com/saurabhk9919/pdf-csv-to-JSON"
+             target="_blank"
+             class="flex-1 inline-flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3.99.96-.27 1.98-.405 3-.405s2.04.135 3 . 405c2.295-1.32 3.3-.99 3.3-.99.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.565 21.795 24 17.31 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Info -->
+    <div class="text-center text-gray-600 text-xs sm:text-sm mt-8">
+      <p>🔐 Your files are processed securely and stored in Firestore</p>
+    </div>
   </div>
 
   <script src="script.js"></script>
