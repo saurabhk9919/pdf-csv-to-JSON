@@ -5,7 +5,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-// Configure Firestore settings
+
 const db = admin.firestore();
 db.settings({
   timestampsInSnapshots: true,
@@ -85,7 +85,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     // Delete temp file
     fs.unlinkSync(filePath);
 
-    // Save to Firestore with simplified data
+    
     const docRef = await db.collection("extracted_files").add({
       uploadId,
       fileName: fileName,
@@ -111,7 +111,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   } catch (error) {
     console.error("Upload error:", error);
     
-    // Clean up temp file if exists
+    
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
@@ -124,7 +124,6 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-// Health check endpoint
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
@@ -133,7 +132,8 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Start server
-app.listen(5000, () => {
-  console.log("Server running at http://localhost:5000");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
