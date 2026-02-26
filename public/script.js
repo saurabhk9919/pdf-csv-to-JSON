@@ -8,16 +8,31 @@ async function uploadFile() {
     return;
   }
 
-  const formData = new FormData();
-  formData.append("file", file);
+  const resultDiv = document.getElementById("result");
+  resultDiv.textContent = "Uploading and processing...";
 
-  const response = await fetch("http://localhost:5000/upload", {
-    method: "POST",
-    body: formData
-  });
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const data = await response.json();
+    const response = await fetch("http://localhost:5000/upload", {
+      method: "POST",
+      body: formData,
+      timeout: 120000 // 2 minute timeout
+    });
 
-  document.getElementById("result").textContent =
-    JSON.stringify(data, null, 2);
+    const data = await response.json();
+
+    if (!response.ok) {
+      resultDiv.textContent = "Error: " + JSON.stringify(data, null, 2);
+      return;
+    }
+
+    resultDiv.textContent = "✅ File uploaded successfully!\n\n" + JSON.stringify(data, null, 2);
+    fileInput.value = ""; // Clear input
+    
+  } catch (error) {
+    resultDiv.textContent = "❌ Error: " + error.message;
+    console.error("Upload failed:", error);
+  }
 }
