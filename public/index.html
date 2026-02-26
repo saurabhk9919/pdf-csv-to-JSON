@@ -15,7 +15,6 @@
 
     <div class="mb-4">
       <input type="file" id="fileInput" class="mb-4 w-full border p-2 rounded" />
-
       <button onclick="uploadFile()"
         class="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600 mb-2">
         Upload File
@@ -27,8 +26,15 @@
     <pre id="result"
       class="mt-2 bg-gray-200 p-3 rounded text-sm overflow-auto h-64 whitespace-pre-wrap break-words"></pre>
 
-    <div class="mt-4 text-xs text-gray-500">
-      <p>📝 View extracted content in Firestore console</p>
+    <div class="mt-4 text-center">
+      <a href="https://console.firebase.google.com/project/extracter-project/firestore" 
+         target="_blank" 
+         class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-yellow-600 transition-all shadow-md hover:shadow-lg">
+        📝 View Data in Firestore Console
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+      </a>
     </div>
 
   </div>

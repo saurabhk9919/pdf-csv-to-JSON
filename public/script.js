@@ -20,8 +20,7 @@ async function uploadFile() {
       body: formData,
       timeout: 120000 // 2 minute timeout
     });
-
-    const data = await response.json();
+  const data = await response.json();
 
     if (!response.ok) {
       resultDiv.textContent = "Error: " + JSON.stringify(data, null, 2);
