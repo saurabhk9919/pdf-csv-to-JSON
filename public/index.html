@@ -39,10 +39,120 @@
       top: 8px;
       right: 8px;
     }
+
+    /* Dark Mode Styles */
+    .dark {
+      background: linear-gradient(to bottom right, #1e293b, #0f172a, #1e1b4b);
+    }
+
+    .dark .bg-white {
+      background-color: #1e293b;
+    }
+
+    .dark .bg-gray-50 {
+      background-color: #0f172a;
+    }
+
+    .dark .bg-gray-800 {
+      background-color: #374151;
+    }
+
+    .dark .text-gray-900 {
+      color: #f1f5f9;
+    }
+
+    .dark .text-gray-700 {
+      color: #cbd5e1;
+    }
+
+    .dark .text-gray-600 {
+      color: #94a3b8;
+    }
+
+    .dark .text-gray-500 {
+      color: #64748b;
+    }
+
+    .dark .border-gray-100 {
+      border-color: #334155;
+    }
+
+    .dark .border-gray-200 {
+      border-color: #475569;
+    }
+
+    .dark .bg-blue-100 {
+      background-color: #1e3a8a;
+    }
+
+    .dark .from-blue-50 {
+      --tw-gradient-from: #1e293b;
+    }
+
+    .dark .to-indigo-50 {
+      --tw-gradient-to: #1e1b4b;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 50;
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .theme-toggle {
+      background: #1e293b;
+      border-color: #475569;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1) rotate(15deg);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .theme-icon {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.3s ease;
+    }
+
+    .gradient-text {
+      color: #4b5563;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .dark .gradient-text {
+      color: #f1f5f9;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 
 <body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50 min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+
+  <!-- toggle button -->
+  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+    <svg id="sunIcon" class="theme-icon text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+    </svg>
+    <svg id="moonIcon" class="theme-icon text-indigo-400 hidden" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+    </svg>
+  </button>
 
   <div class="max-w-4xl mx-auto">
     <!-- Header -->
@@ -53,13 +163,13 @@
         </svg>
       </div>
       <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">File Extractor</h1>
-      <p class="text-gray-600 text-sm sm:text-base">Convert PDF & CSV files to structured JSON data instantly</p>
+      <p class="gradient-text text-sm sm:text-base">Convert PDF & CSV files to structured JSON data instantly</p>
     </div>
 
-    
+  
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-6 animate-slide-in">
       
-      
+     
       <div class="p-6 sm:p-8 border-b border-gray-100">
         <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Upload Your File</h2>
         
@@ -76,7 +186,7 @@
           <p id="fileName" class="text-blue-600 font-medium mt-3 text-sm sm:text-base"></p>
         </div>
 
-      
+       
         <button onclick="uploadFile()"
           id="uploadBtn"
           class="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 sm:py-4 px-4 rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
@@ -102,7 +212,7 @@
         </div>
       </div>
 
-      
+      <!-- Action Links -->
       <div class="p-6 sm:p-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-t border-gray-100">
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <a href="https://console.firebase.google.com/project/extracter-project/firestore" 

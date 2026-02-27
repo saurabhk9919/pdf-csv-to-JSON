@@ -1,10 +1,19 @@
 const admin = require("firebase-admin");
+const fs = require("fs");
 
-if (!process.env.FIREBASE_SERVICE_KEY) {
-  throw new Error("FIREBASE_SERVICE_KEY environment variable not set");
+let serviceAccount;
+
+if (process.env.FIREBASE_SERVICE_KEY) {
+ 
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_KEY);
+} else if (fs.existsSync("./serviceAccountKey.json")) {
+  
+  serviceAccount = require("./serviceAccountKey.json");
+} else {
+  throw new Error(
+    "Firebase credentials not found. Set FIREBASE_SERVICE_KEY environment variable or add serviceAccountKey.json file"
+  );
 }
-
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_KEY);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -16,7 +25,6 @@ const express = require("express");
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
 const csv = require("csv-parser");
-const fs = require("fs");
 const cors = require("cors");
 
 const app = express();
